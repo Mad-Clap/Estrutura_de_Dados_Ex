@@ -1,0 +1,493 @@
+package Lista8.ex05;
+
+import java.util.NoSuchElementException;
+
+public class ArvBinBusca<Chave extends Comparable<Chave>, Valor> 
+{
+	private No raiz; /* Raiz da árvore. */
+
+	private class No
+	{
+		private Chave chave; /* Chave usada nas comparações. */
+		private Valor valor; /* Informação armazenada. */
+		private No esq, dir; /* Referências para subárvores esquerda e direita. */
+
+		/* Cria um nó com chave e valor fornecidos e esq = dir = null. */
+		public No(Chave chave, Valor valor)
+		{
+			this.chave = chave;
+			this.valor = valor;
+			this.esq = null;
+			this.dir = null;
+		}
+		
+		/* Cria um nó com chave e valor fornecidos. As subárvores esq e dir são
+		 * passadas por parâmetro. */
+		public No(Chave chave, Valor valor, No esq, No dir)
+		{
+			this.chave = chave;
+			this.valor = valor;
+			this.esq = esq;
+			this.dir = dir;
+		}
+	}
+	
+	/**
+	 *  Criação de uma árvore vazia. 
+	 */
+	public ArvBinBusca()
+	{
+		raiz = null;
+	}
+	
+	/** 
+	 * Verifica se a árvore está vazia.
+	 * 
+	 * @return se a árvore está vazia ou possui algum elemento
+	 */
+	public boolean vazia()
+	{
+		return (raiz == null);
+	}
+	
+	/**
+	 * Apresenta o conteúdo da árvore em ordem simétrica.
+	 */
+	public void mostra()
+	{
+		mostra(raiz);
+	}
+	
+	private void mostra(No x)
+	{
+		/* Caso base (critério de parada). */
+		if(x == null)
+			return;
+		
+		System.out.print("[");
+		
+		/* Chamada recursiva para a esquerda. */
+		mostra(x.esq);
+		
+		/* Imprime a chave do nó corrente. */
+		System.out.print("<" + x.chave + ">");
+		
+		/* Chamada recursiva para a direita. */
+		mostra(x.dir);
+		
+		System.out.print("]");
+	}
+	
+    /**
+     * Retorna a menor chave da árvore.
+     *
+     * @return a menor chave da árvore
+     * @throws NoSuchElementException se a árvore está vazia
+     */
+    public Chave min()
+    {
+        if(vazia()) 
+        	throw new NoSuchElementException("Árvore está vazia!");
+        
+        return min(raiz).chave;
+    } 
+
+    private No min(No x) { 
+        if (x.esq == null) 
+        	return x; 
+        else
+        	return min(x.esq); 
+    }
+    
+    /**
+     * Retorna o maior elemento da árvore.
+     *
+     * @return o maior elemento da árvore
+     * @throws NoSuchElementException se a árvore está vazia
+     */
+    public Chave max() {
+        if(vazia()) 
+        	throw new NoSuchElementException("A árvore está vazia!");
+        
+        return max(raiz).chave;
+    } 
+
+    private No max(No x) {
+        if (x.dir == null)
+        	return x; 
+        else
+        	return max(x.dir); 
+    }
+    
+    /**
+     * Retorna o número de nós, isto é, pares (chave, valor), contidos na árvore 
+     * binária de busca.
+     * 
+     * @return o número de nós da árvore
+     */
+    public int tamanho()
+    {
+    	return tamanho(raiz);
+    }
+    
+    private int tamanho(No x)
+    {
+    	/* Caso base (critério de parada). */
+    	if(x == null)
+    		return 0;
+    	
+    	/* Chamada recursiva para subárvores esquerda e direita. */
+    	return 1 + tamanho(x.esq) + tamanho(x.dir);
+    }
+    
+    
+    /**
+     * Retorna a altura da árvore binária de busca.
+     *
+     * @return a altura da árvore (uma árvore de um único nó possui altura 0)
+     */
+    public int altura()
+    {
+    	return altura(raiz);
+    }
+    
+    private int altura(No x)
+    {
+    	if(x == null)
+    		return -1;
+    	
+    	int maxAltura = Math.max(altura(x.esq), altura(x.dir));
+    	
+    	return 1 + maxAltura;
+    }
+    
+    
+    /**
+     * Essa árvore binária de busca contém a chave fornecida?
+     *
+     * @param  chave a chave fornecida
+     * @return {@code true} se a árvore contém a chave {@code chave} e
+     *         {@code false} caso contrário
+     * @throws IllegalArgumentException se {@code key} é {@code null}
+     */
+    public boolean contem(Chave chave) {
+        if (chave == null) 
+        	throw new IllegalArgumentException("A chave fornecida é null!");
+        
+        return get(chave) != null;
+    }
+	
+    /**
+     * Retorna o valor associado à chave fornecida.
+     *
+     * @param  chave a chave a ser buscada
+     * @return o valor associado à chave fornecida se tal chave se encontra na árvore
+     *         e {@code null} se a chave não está na árvore
+     * @throws IllegalArgumentException if {@code chave} is {@code null}
+     */
+    public Valor get(Chave chave) 
+    {
+        return get(raiz, chave);
+    }
+
+    private Valor get(No x, Chave chave) 
+    {
+        if(chave == null) 
+        	throw new IllegalArgumentException("A chave fornecida é null!");
+        
+        /* A chave não se encontra na árvore. */
+        if(x == null)
+        	return null;
+        
+        int cmp = chave.compareTo(x.chave);
+        
+        if(cmp < 0) /* Deve-se ir para a esquerda. */
+        	return get(x.esq, chave);
+        else if(cmp > 0) /* Deve-se ir para a direita. */
+        	return get(x.dir, chave);
+        else /* Chave encontrada. */
+        	return x.valor;
+    }
+    
+    /**
+     * Insere na árvore binária de busca o par (chave, valor) fornecido. Caso a árvore
+     * já possua a chave especificada, o valor antigo é sobrescrito com o novo valor 
+     * fornecido. Remove o nó de chave igual à chave fornecida caso o valor especificado
+     * seja {@code null}.
+     *
+     * @param  chave a chave fornecida
+     * @param  valor o valor fornecido
+     * @throws IllegalArgumentException se {@code chave} é {@code null}
+     */
+    public void put(Chave chave, Valor valor)
+    {
+        if(chave == null) 
+        	throw new IllegalArgumentException("A chave fornecida é null!");
+        
+        if(valor == null) {
+            delete(chave);
+            return;
+        }
+        
+        raiz = put(raiz, chave, valor);
+    }
+
+    private No put(No x, Chave chave, Valor valor)
+    {
+    	/* Caso base: encontrou a posição de inserção. */
+        if (x == null)
+        	return new No(chave, valor);
+        
+        int cmp = chave.compareTo(x.chave);
+        
+        if(cmp < 0) /* Deve-se ir para a esquerda. */
+        	x.esq = put(x.esq, chave, valor);
+        else if(cmp > 0) /* Deve-se ir para a direita. */
+        	x.dir = put(x.dir, chave, valor);
+        else /* Caso tenha encontrado nó de mesma chave. */
+        	x.valor = valor;
+        
+        return x;
+    }
+	
+    /**
+     * Remove o nó de menor chave da árvore.
+     *
+     * @throws NoSuchElementException se a árvore está vazia
+     */
+    public void deleteMin() 
+    {
+        if(vazia())
+        	throw new NoSuchElementException("A árvore está vazia!");
+        
+        raiz = deleteMin(raiz);
+    }
+
+    /* Método recursivo que anda sempre para a esquerda, procurando o nó
+     * de menor chave a ser removido. */
+    private No deleteMin(No x) 
+    {
+    	/* Caso não haja filho à esquerda, o nó corrente possui a menor chave. */
+        if(x.esq == null) 
+        	return x.dir;
+        
+        x.esq = deleteMin(x.esq);
+        
+        return x;
+    }
+
+    /**
+     * Remove o nó de maior chave da árvore.
+     *
+     * @throws NoSuchElementException se a árvore está vazia
+     */
+    public void deleteMax()
+    {
+        if(vazia())
+        	throw new NoSuchElementException("A árvore está vazia!");
+        
+        raiz = deleteMax(raiz);
+    }
+
+    /* Método recursivo que anda sempre para a direita, procurando o nó
+     * de maior chave a ser removido. */
+    private No deleteMax(No x) 
+    {
+        if(x.dir == null)
+        	return x.esq;
+        
+        x.dir = deleteMax(x.dir);
+        
+        return x;
+    }
+    
+    /**
+     * Remove o nó cuja chave seja igual à {@code chave} fornecida.
+     * 
+     * @param chave a chave fornecida
+     * @return {@code true} se foi possível remover o nó de chave {@code chave} e
+     *         {@code false} caso contrário
+     */
+    public void delete(Chave chave)
+    {    	
+    	raiz = delete(raiz, chave);    	
+    }
+    
+    /* Remove o nó com o valor "val" da "árvore" a partir do nó para o qual está sendo chamada a função.
+    Obs: "ref_no" é o ponteiro que referencia o nó para o qual está sendo chamada a função,
+    o qual pode ter que ser modificado. Retorna false se o valor não pertencer à "árvore".
+    */
+    private No delete(No x, Chave chave)
+    {
+    	if (x == null)
+    		return null;
+
+    	int cmp = chave.compareTo(x.chave);
+    	
+    	if(cmp < 0)
+    		x.esq = delete(x.esq, chave);
+    	else if(cmp > 0)
+    		x.dir = delete(x.dir, chave);
+    	else
+    	{ 
+    		if(x.dir == null)
+    			return x.esq;
+    		if(x.esq  == null)
+    			return x.dir;
+    		
+    		No t = x;
+
+    		/* Pega o menor da subárvore direita (mais à esquerda). */
+    		x = min(t.dir);
+
+    		/* Remove o menor. */
+    		x.dir = deleteMin(t.dir);
+
+    		/* A subárvore esquerda se mantém a mesma. */
+    		x.esq = t.esq;
+    	}
+
+    	return x;
+    }
+    
+    
+    /**
+     * Retorna a maior chave na árvore que é menor ou igual à {@code chave} fornecida.
+     *
+     * @param  chave a chave fornecida
+     * @return a maior chave na árvore menor ou igual à {@code chave}
+     * @throws NoSuchElementException se a árvore está vazia
+     * @throws IllegalArgumentException se a {@code chave} é {@code null}
+     */
+    public Chave piso(Chave chave)
+    {
+        if (chave == null)
+        	throw new IllegalArgumentException("A chave fornecida é null!");
+        
+        if (vazia()) 
+        	throw new NoSuchElementException("A árvore está vazia!");
+        
+        No x = piso(raiz, chave);
+        
+        if (x == null)
+        	return null;
+        else
+        	return x.chave;
+    } 
+
+    private No piso(No x, Chave chave)
+    {
+        if (x == null)
+        	return null;
+        
+        int cmp = chave.compareTo(x.chave);
+        
+        if (cmp == 0)
+        	return x;
+        
+        if (cmp <  0)
+        	return piso(x.esq, chave);
+        
+        No t = piso(x.dir, chave);
+
+        if (t != null) 
+        	return t;
+        else
+        	return x; 
+    }
+
+    
+    /**
+     * Retorna a menor chave na árvore que é maior ou igual à {@code chave} fornecida.
+     *
+     * @param  chave a chave fornecida
+     * @return a menor chave na árvore maior ou igual à {@code chave}
+     * @throws NoSuchElementException se a árvore está vazia
+     * @throws IllegalArgumentException se a {@code chave} é {@code null}
+     */
+    public Chave topo(Chave chave)
+    {
+        if (chave == null) 
+        	throw new IllegalArgumentException("A chave fornecida é null!");
+
+        if (vazia())
+        	throw new NoSuchElementException("A árvore está vazia!");
+        
+        No x = topo(raiz, chave);
+        
+        if (x == null)
+        	return null;
+        else 
+        	return x.chave;
+    }
+
+    private No topo(No x, Chave chave)
+    {
+        if (x == null)
+        	return null;
+        
+        int cmp = chave.compareTo(x.chave);
+        
+        if (cmp == 0)
+        	return x;
+        
+        if (cmp < 0)
+        { 
+            No t = topo(x.esq, chave);
+            
+            if (t != null)
+            	return t;
+            else
+            	return x; 
+        } 
+        
+        return topo(x.dir, chave); 
+    }
+
+
+    //O método cria internamente uma árvore de busca binária "ancestral", cuja raiz será
+    // o menor ancestral comum dos dois nós passados por parâmetro. Após isso as variáveis Valor prim e seg
+    // recebem o valor das chaves passadas como parâmetro pelo método já existente na classe get().
+    // Se um deles receber null, o método obtemAncestralComum retornará também null.
+    public No obtemAncestralComum(No primeiroNo, No segundoNo){
+
+        ArvBinBusca <Chave,Valor> ancestral = new ArvBinBusca<>();
+        Valor prim, seg;
+        ancestral.raiz = ancestralComum(raiz,primeiroNo.chave, segundoNo.chave);
+
+        prim = get(ancestral.raiz,primeiroNo.chave);
+        seg = get(ancestral.raiz,primeiroNo.chave);
+
+        if(prim==null || seg == null){
+            System.out.println("Um ou ambos os nós não existem na árvore");
+            return null;
+        }
+        //A árvore passa a ser formada por um único nó, a raiz, que é retornada pelo método
+        ancestral.raiz.dir=null;
+        ancestral.raiz.esq=null;
+
+        return ancestral.raiz;
+    }
+
+    //Retorna o primeiro nó que não tenha um nó que possua a chave prim e chave seg no mesmo lado de sua sub-árvore,
+    // ou seja, se o nó tiver uma chave maior ou menor tanto da chave prim quanto da chave seg, a busca continua
+    // até achar-se um nó cuja chave seja maior que prim e menor que seg ou maior que seg e menor que prim.
+    private No ancestralComum (No x, Chave prim, Chave seg){
+
+        if(x==null) return null;
+
+        if(x.chave.compareTo(prim)<0 && x.chave.compareTo(seg)<0){
+            return ancestralComum(x.esq,prim,seg);
+        } else if(x.chave.compareTo(prim)>0 && x.chave.compareTo(seg)>0){
+            return ancestralComum(x.dir,prim,seg);
+        }
+         return x;
+    }
+
+    //Método para testar os métodos acima
+    public Chave teste(){
+        No teste = this.obtemAncestralComum(this.max(raiz), this.min(raiz));
+        return teste.chave;
+    }
+
+}
